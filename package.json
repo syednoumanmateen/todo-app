@@ -1,0 +1,16 @@
+{
+  "name": "microservices",
+  "version": "1.0.0",
+  "description": "Example of a microservices architecture in Node.js with shared modules",
+  "scripts": {
+    "start:user-service": "cd userService && npm start",
+    "start:todo-service": "cd todoService && npm start",
+    "start:blog-service": "cd blogService && npm start",
+    "start:upload-service": "cd uploadService && npm start",
+    "start:message-service": "cd messageService && npm start"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
