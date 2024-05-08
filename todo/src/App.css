@@ -57,8 +57,16 @@ table.table tbody {
   height: 95%;
 }
 
+.h-82 {
+  height: 82%;
+}
+
 .img {
   max-width: 250px;
   max-height: 250px;
   object-fit: contain;
+}
+
+.brd-trans {
+  border-right: 2px solid;
 }

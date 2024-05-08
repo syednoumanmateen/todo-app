@@ -11,7 +11,7 @@ interface props { }
 
 const List: FC<props> = ({ }) => {
   const { loading, fetchAllBlog } = useBlog()
-  const [data, setData] = useState()
+  const [data, setData] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {

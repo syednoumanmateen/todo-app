@@ -5,6 +5,12 @@ const helper = {
       acc[key] = decodeURIComponent(value);
       return acc;
     }, {})
+  },
+  isObj: (obj: any) => {
+    if (obj) {
+      if (Object.keys(obj).length) return true
+      return false
+    }
   }
 }
 

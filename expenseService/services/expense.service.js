@@ -11,6 +11,13 @@ module.exports = {
       throw customException.error(statusCode.SERVER_ERROR, e.message || constants.unknownErrorMessage, e.displayMessage || constants.unknownErrorMessage)
     }
   },
+  fetchExpense: async (userId, params) => {
+    try {
+      return await expenseQuery.fetchExpense(userId, params.id)
+    } catch (e) {
+      throw customException.error(statusCode.SERVER_ERROR, e.message || constants.unknownErrorMessage, e.displayMessage || constants.unknownErrorMessage)
+    }
+  },
   createExpense: async (userId, data) => {
     try {
       const { name, amount, category, date } = data

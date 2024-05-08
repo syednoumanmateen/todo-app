@@ -31,7 +31,7 @@ const Add: FC<props> = ({ }) => {
       setValue('description', data.description)
     }
 
-    if (op === 'edit') {
+    if (op === 'edit' && _id) {
       api()
     }
   }, [op, _id])

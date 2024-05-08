@@ -32,6 +32,42 @@ module.exports = {
     }
   },
   /**
+* @swagger
+* /fetch/{id}:
+*   get:
+*     summary: Get expense
+*     description: get expense
+*     security:
+*       - cookieAuth: []
+*     parameters:
+*       - name: id       
+*         in: path
+*         description: ID of the image
+*         required: true
+*         schema:
+*           type: string
+*           format: objectId
+*     responses:
+*       200:
+*         description: Expense fetched successfully
+*       500:
+*         description: Server error
+*       400:
+*         description: Bad request
+*       401:
+*         description: Unauthorized access
+*       404:
+*         description: Images not found
+*/
+  fetchExpense: async (req, res) => {
+    try {
+      const result = await expenseService.fetchExpense(req.userId, req.params)
+      res.status(statusCode.SUCCESS).json(response.successWith(result, statusCode.SUCCESS, "Expense list fetched successfully", "Expense list fetched successfully"))
+    } catch (e) {
+      res.status(e.errorCode).json(response.errorWith(e.errorCode, e.message, e.displayMessage, e.customStatusCode, e.customData));
+    }
+  },
+  /**
   * @swagger
   * /create:
   *   post:

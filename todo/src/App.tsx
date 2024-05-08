@@ -23,6 +23,7 @@ const SignUp = lazy(() => import('./pages/user/SignUp'));
 const Chat = lazy(() => import('./pages/chat/Chat'));
 const MessageContainer = lazy(() => import('./pages/chat/MessageContainer'));
 const Expense = lazy(() => import('./pages/expense/ExpenseTracker'));
+const ExpenseList = lazy(() => import('./pages/expense/ExpenseList'));
 const ExpenseAdd = lazy(() => import('./pages/expense/ExpenseAdd'));
 const IncomeAdd = lazy(() => import('./pages/expense/IncomeAdd'));
 
@@ -48,7 +49,8 @@ const protectedRoutes = [
   },
   {
     path: '/expense', element: <ProtectedRoute />, childrens: [
-      { path: 'list', element: <Expense /> },
+      { path: 'dashboard', element: <Expense /> },
+      { path: 'list', element: <ExpenseList /> },
       { path: 'expenseAdd', element: <ExpenseAdd /> },
       { path: 'incomeAdd', element: <IncomeAdd /> }]
   }]

@@ -73,6 +73,7 @@ module.exports = {
           amount: 1,
           description: 1,
           type: 1,
+          date: 1,
           category: "$category",
           user: "$user",
           createdBy: "$createdBy",
@@ -85,12 +86,115 @@ module.exports = {
         $group: {
           _id: '$type',
           totalAmount: { $sum: '$amount' },
-          List: { $push: '$$ROOT' }
+          list: { $push: '$$ROOT' }
+        }
+      }, {
+        $sort: {
+          date: -1
         }
       }])
 
       if (result && result.length) {
         return result
+      }
+      throw customException.error(statusCode.NOT_FOUND, "Expense not found", "Expense not found")
+    } catch (e) {
+      if (e instanceof customException.customException) throw e;
+      throw customException.error(statusCode.SERVER_ERROR, e.message || constants.unknownErrorMessage, e.displayMessage || constants.unknownErrorMessage)
+    }
+  },
+  fetchExpense: async (userId, _id) => {
+    try {
+      const objectId = new mongoose.Types.ObjectId(userId)
+      const _idObjectId = new mongoose.Types.ObjectId(_id)
+      const result = await Expense.aggregate([{ $match: { userId: objectId, _id: _idObjectId } },
+      {
+        $lookup: {
+          from: "user",
+          localField: "userId",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "user"
+        }
+      },
+      {
+        $unwind: {
+          path: "$user",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "category",
+          localField: "category",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "category"
+        }
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "user",
+          localField: "createdBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "createdBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$createdBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $lookup: {
+          from: "user",
+          localField: "updatedBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "updatedBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$updatedBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $project: {
+          name: 1,
+          amount: 1,
+          description: 1,
+          type: 1,
+          date: 1,
+          category: "$category",
+          user: "$user",
+          createdBy: "$createdBy",
+          updatedBy: "$updatedBy",
+          createdAt: 1,
+          updatedAt: 1,
+          totalAmount: 1
+        }
+      }, {
+        $group: {
+          _id: '$type',
+          totalAmount: { $sum: '$amount' },
+          list: { $push: '$$ROOT' }
+        }
+      }, {
+        $sort: {
+          date: -1
+        }
+      }])
+
+      if (result && result.length) {
+        return result[0]
       }
       throw customException.error(statusCode.NOT_FOUND, "Expense not found", "Expense not found")
     } catch (e) {

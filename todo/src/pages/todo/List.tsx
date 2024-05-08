@@ -11,7 +11,7 @@ interface props { }
 
 const List: FC<props> = ({ }) => {
   const { loading, fetchAllTodo } = useTodo()
-  const [data, setData] = useState()
+  const [data, setData] = useState([])
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const List: FC<props> = ({ }) => {
         <div className="flex justify-end">
           <button className="btn btn-accent text-light" onClick={() => navigate("/todo/add")}>Add</button>
         </div>
-        <div className="rounded-lg overflow-hidden m-3">
+        <div className="rounded-lg m-3">
           {loading && <Spinner />}
           {!loading && data ? <Table headings={['Sl No', 'Name', 'Description', 'Status', 'actions']} data={data} /> : <Notfound />}
         </div>

@@ -46,7 +46,7 @@ const Add: FC<props> = ({ }) => {
       setValue('description', data.description)
     }
 
-    if (op === 'edit') {
+    if (op === 'edit' && _id) {
       api()
     }
   }, [op, _id])
@@ -75,7 +75,6 @@ const Add: FC<props> = ({ }) => {
       }
     }
   }
-
 
   return (
     <Content title={op === "edit" ? "Blog Edit" : "Blog Add"}>
