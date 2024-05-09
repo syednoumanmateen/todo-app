@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Spinner from './components/Spinner';
 import { Toaster } from 'react-hot-toast';
+import VideoGallery from './pages/VideoGallery';
 
 const MainLayout = lazy(() => import('./components/MainLayout'));
 const AuthLayout = lazy(() => import('./components/AuthLayout'));
@@ -26,6 +27,8 @@ const Expense = lazy(() => import('./pages/expense/ExpenseTracker'));
 const ExpenseList = lazy(() => import('./pages/expense/ExpenseList'));
 const ExpenseAdd = lazy(() => import('./pages/expense/ExpenseAdd'));
 const IncomeAdd = lazy(() => import('./pages/expense/IncomeAdd'));
+const videoGallery = lazy(() => import('./pages/VideoGallery'));
+const ImagesGallery = lazy(() => import('./pages/ImageGallery'));
 
 const publicRoutes = [
   { path: '/signIn', element: <SignIn /> },
@@ -71,6 +74,8 @@ const App: FC<props> = ({ }) => {
           <Route element={<MainLayout />}>
             <Route path="/" element={<Suspense fallback={<Spinner />}> <ProtectedRoute /> </Suspense>}>
               <Route index element={<Suspense fallback={<Spinner />}> <Dashboard /> </Suspense>} />
+              <Route path="/imageGallery" element={<Suspense fallback={<Spinner />}> <ImagesGallery /> </Suspense>} />
+              <Route path="/VideoGallery" element={<Suspense fallback={<Spinner />}> <VideoGallery /> </Suspense>} />
               <Route path="/profile" element={<Suspense fallback={<Spinner />}> <Profile /> </Suspense>} />
               <Route path="/chat" element={<Suspense fallback={<Spinner />}> <Chat /> </Suspense>}>
                 <Route path=":id" element={<Suspense fallback={<Spinner />}> <MessageContainer /> </Suspense>} />

@@ -12,5 +12,7 @@ module.exports = function (router) {
   router.post("/reload", [], userController.reload)
   router.post("/signOut", [], userController.signOut)
   router.put("/update", [authMiddleware.validateToken], userController.updateUser)
+  router.put("/update/role", [authMiddleware.validateToken], userController.updateUserRole)
+  router.put("/update/profileAccess", [authMiddleware.validateToken], userController.updateUserProfileAccess)
   router.delete("/delete", [authMiddleware.validateToken], userController.deleteUser)
 }

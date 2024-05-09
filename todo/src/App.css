@@ -61,6 +61,10 @@ table.table tbody {
   height: 82%;
 }
 
+.h-75 {
+  height: 75%;
+}
+
 .img {
   max-width: 250px;
   max-height: 250px;

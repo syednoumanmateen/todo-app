@@ -13,18 +13,31 @@ const userSchema = new mongoose.Schema({
     unique: true
   },
   gender: {
-    required: true,
-    type: String
+    type: String,
+    enum: ['male', 'female'],
+    required: true
   },
   password: {
     required: true,
     type: String,
     unique: true
   },
+  bio: {
+    type: String
+  },
   profile: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Upload",
     default: null
+  },
+  isPublicProfile: {
+    type: Boolean,
+    default: false
+  },
+  role: {
+    type: String,
+    enum: ['admin', 'user'],
+    default: 'user'
   },
   resetToken: {
     type: String,
@@ -41,31 +54,37 @@ const userSchema = new mongoose.Schema({
 })
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(this.password, salt);
-    this.password = hashedPassword;
+  if (this.isModified("password")) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(this.password, salt);
+      this.password = hashedPassword;
+      next();
+    } catch (e) {
+      next(e);
+    }
+  } else {
     next();
-  } catch (e) {
-    next(e);
   }
 });
 
 userSchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
 
-  if (!update.$set && !update.$set.password && !this.isModified("password")) return next();
-  try {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(update.password, salt);
-    update.password = hashedPassword;
+  if (update.$set && update.$set.password && this.isModified('password')) {
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(update.$set.password, salt);
+      update.$set.password = hashedPassword;
+      next();
+    } catch (e) {
+      next(e);
+    }
+  } else {
     next();
-  } catch (e) {
-    next(e);
   }
 });
+
 
 
 module.exports = mongoose.model("User", userSchema)

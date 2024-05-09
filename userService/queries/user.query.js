@@ -2,14 +2,95 @@ const constants = require("../../commonService/constants")
 const customException = require("../../commonService/customException")
 const statusCode = require("../../commonService/statusCode")
 const helper = require("../../commonService/utility/helper")
+const imageUpload = require("../../commonService/utility/imageUpload")
 const User = require("../models/user.model")
 const mongoose = require("mongoose")
 
 module.exports = {
   fetchAllUser: async () => {
     try {
-      let result = await User.find({}).lean()
+      let result = await User.aggregate([{
+        $lookup: {
+          from: "category",
+          localField: "category",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "upload",
+          localField: "profile",
+          foreignField: "_id",
+          as: "profile"
+        }
+      },
+      {
+        $unwind: {
+          path: "$profile",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "user",
+          localField: "createdBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "createdBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$createdBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $lookup: {
+          from: "user",
+          localField: "updatedBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "updatedBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$updatedBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $project: {
+          name: 1,
+          email: 1,
+          profile: 1,
+          isPublicProfile: 1,
+          profileImg: "$profile.upload",
+          gender: 1,
+          role: 1,
+          bio:1,
+          createdBy: "$createdBy",
+          updatedBy: "$updatedBy",
+          createdAt: 1,
+          updatedAt: 1
+        }
+      }])
+
       if (result && result.length) {
+        result = await Promise.all(result.map(async (prof) => {
+          return {
+            ...prof,
+            profile: (prof.role === "admin" || prof.isPublicProfile) ? prof.profile : null,
+            profileImg: (prof.role === "admin" || prof.isPublicProfile) ? await imageUpload.bufferToUrl(prof?.profileImg?.data) : null
+          }
+        }))
+
         return result
       }
       throw customException.error(statusCode.NOT_FOUND, "User not found", "User not found")
@@ -20,8 +101,88 @@ module.exports = {
   },
   fetchAllUserMessage: async (userId) => {
     try {
-      let result = await User.find({ _id: { $ne: userId } }, { name: 1, email: 1, profile: 1, gender: 1 }).lean().lean()
+      let result = await User.aggregate([{ $match: { $ne: userId } }, {
+        $lookup: {
+          from: "category",
+          localField: "category",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+      {
+        $unwind: {
+          path: "$category",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "upload",
+          localField: "profile",
+          foreignField: "_id",
+          as: "profile"
+        }
+      },
+      {
+        $unwind: {
+          path: "$profile",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "user",
+          localField: "createdBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "createdBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$createdBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $lookup: {
+          from: "user",
+          localField: "updatedBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "updatedBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$updatedBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $project: {
+          name: 1,
+          email: 1,
+          profile: 1,
+          isPublicProfile: 1,
+          profileImg: "$profile.upload",
+          gender: 1,
+          role: 1,
+          bio:1,
+          createdBy: "$createdBy",
+          updatedBy: "$updatedBy",
+          createdAt: 1,
+          updatedAt: 1
+        }
+      }])
+
       if (result && result.length) {
+        result = await Promise.all(result.map(async (prof) => {
+          return {
+            ...prof,
+            profile: (prof.role === "admin" || prof.isPublicProfile) ? prof.profile : null,
+            profileImg: (prof.role === "admin" || prof.isPublicProfile) ? await imageUpload.bufferToUrl(prof?.profileImg?.data) : null
+          }
+        }))
+
         return result
       }
       throw customException.error(statusCode.NOT_FOUND, "User not found", "User not found")
@@ -33,9 +194,76 @@ module.exports = {
   fetchUserById: async (id) => {
     try {
       const objectId = new mongoose.Types.ObjectId(id);
-      const result = await User.findOne({ _id: objectId }, { name: 1, email: 1, profile: 1, gender: 1 }).lean().lean()
-      if (result) {
-        return result
+      let result = await User.aggregate([{ $match: { _id: objectId } },
+      {
+        $lookup: {
+          from: "upload",
+          localField: "profile",
+          foreignField: "_id",
+          as: "profile"
+        }
+      },
+      {
+        $unwind: {
+          path: "$profile",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "user",
+          localField: "createdBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "createdBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$createdBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $lookup: {
+          from: "user",
+          localField: "updatedBy",
+          foreignField: "_id",
+          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+          as: "updatedBy"
+        }
+      },
+      {
+        $unwind: {
+          path: "$updatedBy",
+          preserveNullAndEmptyArrays: true
+        }
+      }, {
+        $project: {
+          name: 1,
+          email: 1,
+          profile: 1,
+          isPublicProfile: 1,
+          profileImg: "$profile.upload",
+          gender: 1,
+          role: 1,
+          bio:1,
+          createdBy: "$createdBy",
+          updatedBy: "$updatedBy",
+          createdAt: 1,
+          updatedAt: 1
+        }
+      }])
+
+      if (result && result.length) {
+        result = await Promise.all(result.map(async (prof) => {
+          return {
+            ...prof,
+            profile: (prof.role === "admin" || prof.isPublicProfile) ? prof.profile : null,
+            profileImg: (prof.role === "admin" || prof.isPublicProfile) ? await imageUpload.bufferToUrl(prof?.profileImg?.data) : null
+          }
+        }))
+
+        return result[0]
       }
       throw customException.error(statusCode.NOT_FOUND, "User not found", "User not found")
     } catch (e) {

@@ -27,9 +27,6 @@ interface resetPasswordData {
   password: string;
 }
 
-interface profileResponse {
-  data: any
-}
 
 interface response {
   displayMessage: string;
@@ -41,7 +38,7 @@ interface userHook {
   signUp: (url: string, userData: siginUpData) => Promise<response | undefined>;
   signIn: (url: string, userData: signInData) => Promise<response | undefined>;
   reload: (url: string, userData: reloadData) => Promise<response | undefined>;
-  profile: (url: string) => Promise<profileResponse | undefined>;
+  profile: (url: string) => Promise<response | undefined>;
   forgotPassword: (url: string, userData: forgotPasswordData) => Promise<response | undefined>;
   resetPassword: (url: string, userData: resetPasswordData) => Promise<response | undefined>;
   signOut: (url: string) => Promise<response | undefined>;
@@ -86,7 +83,7 @@ const useUser = (): userHook => {
     }
   }
 
-  const profile = async (url: string): Promise<profileResponse | undefined> => {
+  const profile = async (url: string): Promise<response | undefined> => {
     try {
       setLoading(true);
       const result = await axios.get(url, { withCredentials: true });

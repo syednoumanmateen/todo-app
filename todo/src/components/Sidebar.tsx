@@ -2,9 +2,11 @@ import { FC, memo } from 'react'
 import { NavLink } from 'react-router-dom'
 import { MdSpaceDashboard } from "react-icons/md";
 import { RiTodoLine } from "react-icons/ri";
-import { FaBlog, FaMoneyBillTransfer } from "react-icons/fa6";
+import { FaBlog, FaMoneyBillTransfer, FaRegImages } from "react-icons/fa6";
 import { BsFillChatFill } from "react-icons/bs";
 import { HiMenuAlt2 } from 'react-icons/hi';
+import { AiFillProfile } from 'react-icons/ai';
+import { BiSolidVideos } from 'react-icons/bi';
 
 const menu = [{
   to: "/",
@@ -38,11 +40,14 @@ const menu = [{
     to: "/blog/add",
     name: "Add"
   }]
-},{
+}, {
   to: "/expense/list",
   name: "Expense",
   icon: <FaMoneyBillTransfer className="text-xl" />,
   sub: [{
+    to: "/expense/dashboard",
+    name: "Home"
+  }, {
     to: "/expense/list",
     name: "List"
   }, {
@@ -56,6 +61,18 @@ const menu = [{
   to: "/chat",
   name: "Chat",
   icon: <BsFillChatFill className="text-xl" />
+}, {
+  to: "/profile",
+  name: "Profile",
+  icon: <AiFillProfile className="text-xl" />
+}, {
+  to: "/imageGallery",
+  name: "Images",
+  icon: <FaRegImages className="text-xl" />
+}, {
+  to: "/videoGallery",
+  name: "Videos",
+  icon: < BiSolidVideos className="text-xl" />
 }]
 
 interface props {

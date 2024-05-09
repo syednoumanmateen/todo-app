@@ -7,6 +7,8 @@ import userApi from '../api/userApi';
 import { useAuth } from '../context/AuthContext';
 import useUser from '../hooks/useUser';
 import helper from '../utility/helper';
+import { useTheme } from '../context/ThemeContext';
+import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 
 interface props {
   showSideBar: boolean,
@@ -16,6 +18,7 @@ interface props {
 const Navbar: FC<props> = ({ showSideBar, setShowSideBar }) => {
   const { reload, signOut } = useUser()
   const auth = useAuth()
+  const theme = useTheme()
   const token = useMemo(() => helper.getCookiesData().token, [document.cookie])
 
   const handleReload = async () => {
@@ -42,6 +45,10 @@ const Navbar: FC<props> = ({ showSideBar, setShowSideBar }) => {
           </button>
           <a className="navbar-brand" href="#">One Piece</a>
           <div className='text-light'>
+            <button className="btn btn-ghost btn-circle text-xl text-light"> {theme?.theme === "dark" ? <IoMoonOutline /> : <IoSunnyOutline />}</button>
+            <button className="btn btn-ghost btn-circle" onClick={() => theme?.themeToggler()}>
+              <input type="checkbox" value="synthwave" className="toggle theme-controller border-info [--tglbg:theme(colors.black)] checked:bg-white checked:[--tglbg:theme(colors.info)] row-start-1 col-start-1 col-span-2" />
+            </button>
             <button className="btn btn-ghost btn-circle" onClick={handleReload}>
               <TbReload className='text-xl' />
             </button>

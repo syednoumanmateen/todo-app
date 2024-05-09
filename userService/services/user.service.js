@@ -7,6 +7,7 @@ const tokenHelper = require("../../commonService/utility/token")
 const emailHelper = require("../../commonService/utility/sendEmail")
 const helper = require("../../commonService/utility/helper")
 const { v4: uuid } = require("uuid")
+const userHelper = require("../utility/userHelper")
 
 module.exports = {
   fetchAllUser: async () => {
@@ -36,7 +37,7 @@ module.exports = {
       if (!name || !email || !password || !gender) throw customException.error(statusCode.BAD_REQUEST, "Please proide the valid input", "Please proide the valid input")
 
       const result = await userQuery.addUser(data)
-      return result
+      return await userHelper.userResultFormater(result)
     } catch (e) {
       if (e instanceof customException.customException) throw e;
       throw customException.error(statusCode.SERVER_ERROR, e.message || constants.unknownErrorMessage, e.displayMessage || constants.unknownErrorMessage)
@@ -52,16 +53,10 @@ module.exports = {
       const isPasswordMatch = await bcrypt.compare(password, user.password);
       if (!isPasswordMatch) throw customException.error(statusCode.BAD_REQUEST, "Invalid email or password", "Invalid email or password")
 
-      const token = await tokenHelper.generateToken({ _id: user._id }, "6h")
+      const token = await tokenHelper.generateToken({ _id: user._id, role: user.role }, "6h")
       res.cookie('token', token);
 
-      const result = {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        gender: user.gender,
-        profile: user.profile
-      }
+      const result = await userHelper.userResultFormater(user)
       return result
     } catch (e) {
       if (e instanceof customException.customException) throw e;
@@ -99,7 +94,7 @@ module.exports = {
   reload: async (data, res) => {
     try {
       const decode = await tokenHelper.decodeToken(data.token)
-      const newToken = await tokenHelper.generateToken({ _id: decode._id }, "10h")
+      const newToken = await tokenHelper.generateToken({ _id: decode._id, role: decode.role }, "10h")
 
       res.cookie('token', newToken);
       return true
@@ -118,6 +113,22 @@ module.exports = {
     }
   },
   updateUser: async (id, data) => {
+    try {
+      await userQuery.updateUser(id, data)
+      return true
+    } catch (e) {
+      throw customException.error(statusCode.SERVER_ERROR, e.message || constants.unknownErrorMessage, e.displayMessage || constants.unknownErrorMessage)
+    }
+  },
+  updateUseRole: async (id, data) => {
+    try {
+      await userQuery.updateUser(id, data)
+      return true
+    } catch (e) {
+      throw customException.error(statusCode.SERVER_ERROR, e.message || constants.unknownErrorMessage, e.displayMessage || constants.unknownErrorMessage)
+    }
+  },
+  updateUserProfileAccess: async (id, data) => {
     try {
       await userQuery.updateUser(id, data)
       return true

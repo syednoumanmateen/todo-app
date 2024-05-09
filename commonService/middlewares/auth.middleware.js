@@ -11,6 +11,7 @@ module.exports = {
       if (!verified) throw customException.error(statusCode.UN_AUTHORIZED, "un_authorized token", "un_authorized token")
       req.token = token
       req.userId = verified._id
+      req.role = verified.role
       next()
     } catch (e) {
       if (e instanceof customException.customException) throw e;

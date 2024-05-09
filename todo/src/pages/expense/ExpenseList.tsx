@@ -47,7 +47,7 @@ const ExpenseList: FC<props> = ({ }) => {
   const handleScroll = () => {
     setScrollLoading(true)
     setTimeout(() => {
-      setVisibleItems(prev => data.length > prev ? prev + 10 : prev)
+      setVisibleItems(prev => data.length >= prev ? prev + 10 : prev)
       setScrollLoading(false)
     }, 1000)
   };
@@ -64,7 +64,7 @@ const ExpenseList: FC<props> = ({ }) => {
           <TransactionList key={ind} exp={exp} ind={ind} handleDelete={handleDelete} />
         ))}
       </ul>
-      <button className="btn btn-sm btn-info w-full p-2 text-white" onClick={handleScroll}>{scrollLoading ? 'Load more...' : 'Load more'}</button>
+      <button className="btn btn-sm btn-info w-full p-2 text-white">{scrollLoading ? 'Load more...' : 'Load more'}</button>
       {loading && <Spinner />}
     </Content >
   )

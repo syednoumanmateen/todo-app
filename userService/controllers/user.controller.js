@@ -103,12 +103,15 @@ module.exports = {
   *               -name
   *               -email
   *               -password
+  *               -gender
   *             properties:
   *               name:
   *                 type: string
   *               email:
   *                 type: string
   *               password:
+  *                 type: string
+  *               gender:
   *                 type: string
   *               profile:
   *                 type: string  
@@ -340,6 +343,10 @@ module.exports = {
   *               profile:
   *                 type: string  
   *                 format: objectId
+  *               isPublicProfile:
+  *                 type: boolean
+  *               role:
+  *                 type: string
   *     responses:
   *       200:
   *         description: User updated successfully
@@ -356,6 +363,80 @@ module.exports = {
     try {
       const result = await userService.updateUser(req.userId, req.body)
       res.status(statusCode.SUCCESS).json(response.successWith(result, statusCode.SUCCESS, "User updated successfully", "User updated successfully"))
+    } catch (e) {
+      res.status(e.errorCode).json(response.errorWith(e.errorCode, e.message, e.displayMessage, e.customStatusCode, e.customData));
+    }
+  },
+  /**
+  * @swagger
+  * /update/role:
+  *   put:
+  *     summary: Update user role
+  *     description: update user role
+  *     security:
+  *       - cookieAuth: []
+  *     requestBody:
+  *       required: true
+  *       content:
+  *         application/json:
+  *           schema:
+  *             type: object
+  *             properties:
+  *               role:
+  *                 type: string
+  *     responses:
+  *       200:
+  *         description: User role updated successfully
+  *       500:
+  *         description: Server error
+  *       400:
+  *         description: Bad request
+  *       401:
+  *         description: Unauthorized access
+  *       404:
+  *         description: Not found
+  */
+  updateUserRole: async (req, res) => {
+    try {
+      const result = await userService.updateUseRole(req.userId, req.body)
+      res.status(statusCode.SUCCESS).json(response.successWith(result, statusCode.SUCCESS, "User role updated successfully", "User role updated successfully"))
+    } catch (e) {
+      res.status(e.errorCode).json(response.errorWith(e.errorCode, e.message, e.displayMessage, e.customStatusCode, e.customData));
+    }
+  },
+  /**
+ * @swagger
+ * /update/profileAccess:
+ *   put:
+ *     summary: Update user role
+ *     description: update user role
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               isPublicProfile:
+ *                 type: boolean
+ *     responses:
+ *       200:
+ *         description: User profile access updated successfully
+ *       500:
+ *         description: Server error
+ *       400:
+ *         description: Bad request
+ *       401:
+ *         description: Unauthorized access
+ *       404:
+ *         description: Not found
+ */
+  updateUserProfileAccess: async (req, res) => {
+    try {
+      const result = await userService.updateUserProfileAccess(req.userId, req.body)
+      res.status(statusCode.SUCCESS).json(response.successWith(result, statusCode.SUCCESS, "User profile access updated successfully", "User profile access updated successfully"))
     } catch (e) {
       res.status(e.errorCode).json(response.errorWith(e.errorCode, e.message, e.displayMessage, e.customStatusCode, e.customData));
     }

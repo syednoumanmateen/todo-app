@@ -5,7 +5,6 @@ interface props { }
 const Dashboard: FC<props> = ({ }) => {
   return (
     <>
-
     </>
   )
 }
