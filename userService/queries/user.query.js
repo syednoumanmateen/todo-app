@@ -9,78 +9,65 @@ const mongoose = require("mongoose")
 module.exports = {
   fetchAllUser: async () => {
     try {
-      let result = await User.aggregate([{
-        $lookup: {
-          from: "category",
-          localField: "category",
-          foreignField: "_id",
-          as: "category"
-        }
-      },
-      {
-        $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
-        $lookup: {
-          from: "upload",
-          localField: "profile",
-          foreignField: "_id",
-          as: "profile"
-        }
-      },
-      {
-        $unwind: {
-          path: "$profile",
-          preserveNullAndEmptyArrays: true
-        }
-      },
-      {
-        $lookup: {
-          from: "user",
-          localField: "createdBy",
-          foreignField: "_id",
-          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
-          as: "createdBy"
-        }
-      },
-      {
-        $unwind: {
-          path: "$createdBy",
-          preserveNullAndEmptyArrays: true
-        }
-      }, {
-        $lookup: {
-          from: "user",
-          localField: "updatedBy",
-          foreignField: "_id",
-          pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
-          as: "updatedBy"
-        }
-      },
-      {
-        $unwind: {
-          path: "$updatedBy",
-          preserveNullAndEmptyArrays: true
-        }
-      }, {
-        $project: {
-          name: 1,
-          email: 1,
-          profile: 1,
-          isPublicProfile: 1,
-          profileImg: "$profile.upload",
-          gender: 1,
-          role: 1,
-          bio:1,
-          createdBy: "$createdBy",
-          updatedBy: "$updatedBy",
-          createdAt: 1,
-          updatedAt: 1
-        }
-      }])
+      let result = await User.aggregate([
+        {
+          $lookup: {
+            from: "upload",
+            localField: "profile",
+            foreignField: "_id",
+            as: "profile"
+          }
+        },
+        {
+          $unwind: {
+            path: "$profile",
+            preserveNullAndEmptyArrays: true
+          }
+        },
+        {
+          $lookup: {
+            from: "user",
+            localField: "createdBy",
+            foreignField: "_id",
+            pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+            as: "createdBy"
+          }
+        },
+        {
+          $unwind: {
+            path: "$createdBy",
+            preserveNullAndEmptyArrays: true
+          }
+        }, {
+          $lookup: {
+            from: "user",
+            localField: "updatedBy",
+            foreignField: "_id",
+            pipeline: [{ $project: { name: 1, email: 1, createdAt: 1, updatedAt: 1 } }],
+            as: "updatedBy"
+          }
+        },
+        {
+          $unwind: {
+            path: "$updatedBy",
+            preserveNullAndEmptyArrays: true
+          }
+        }, {
+          $project: {
+            name: 1,
+            email: 1,
+            profile: 1,
+            isPublicProfile: 1,
+            profileImg: "$profile.upload",
+            gender: 1,
+            role: 1,
+            bio: 1,
+            createdBy: "$createdBy",
+            updatedBy: "$updatedBy",
+            createdAt: 1,
+            updatedAt: 1
+          }
+        }])
 
       if (result && result.length) {
         result = await Promise.all(result.map(async (prof) => {
@@ -101,20 +88,7 @@ module.exports = {
   },
   fetchAllUserMessage: async (userId) => {
     try {
-      let result = await User.aggregate([{ $match: { $ne: userId } }, {
-        $lookup: {
-          from: "category",
-          localField: "category",
-          foreignField: "_id",
-          as: "category"
-        }
-      },
-      {
-        $unwind: {
-          path: "$category",
-          preserveNullAndEmptyArrays: true
-        }
-      },
+      let result = await User.aggregate([{ $match: { $ne: userId } },
       {
         $lookup: {
           from: "upload",
@@ -166,7 +140,7 @@ module.exports = {
           profileImg: "$profile.upload",
           gender: 1,
           role: 1,
-          bio:1,
+          bio: 1,
           createdBy: "$createdBy",
           updatedBy: "$updatedBy",
           createdAt: 1,
@@ -194,8 +168,7 @@ module.exports = {
   fetchUserById: async (id) => {
     try {
       const objectId = new mongoose.Types.ObjectId(id);
-      let result = await User.aggregate([{ $match: { _id: objectId } },
-      {
+      let result = await User.aggregate([{ $match: { _id: objectId } }, {
         $lookup: {
           from: "upload",
           localField: "profile",
@@ -246,7 +219,7 @@ module.exports = {
           profileImg: "$profile.upload",
           gender: 1,
           role: 1,
-          bio:1,
+          bio: 1,
           createdBy: "$createdBy",
           updatedBy: "$updatedBy",
           createdAt: 1,
